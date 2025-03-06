@@ -1,0 +1,45 @@
+.container {
+  border: 1px solid #000;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 350px;
+  margin-bottom: 12px;
+}
+
+.contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  padding-left: 12px;
+}
+
+.text {
+  font-size: 18px;
+}
+
+.button {
+  padding: 10px 15px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.button:focus,
+.button:hover {
+  background-color: #c6c5c5;
+  cursor: pointer;
+}
