@@ -1,37 +1,58 @@
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import css from "./App.module.css";
-import ContactForm from "../ContactForm/ContactForm";
-import ContactList from "../ContactList/ContactList";
-import SearchBox from "../SearchBox/SearchBox";
-import { ErrorMessage } from "formik";
-import { useEffect } from "react";
-import { fetchContacts } from "../../redux/contactsOps";
+import { Routes, Route, Navigate } from "react-router";
+import { refreshUser } from "../../redux/auth/operations";
+import { fetchContacts } from "../../redux/contacts/operations";
 import {
-  selectContacts,
-  selectError,
-  selectLoading,
-} from "../../redux/contactsSlice";
+  selectIsRefreshing,
+  selectIsLoggedIn,
+} from "../../redux/auth/selectors";
+import Layout from "../Layout";
+import PrivateRoute from "../PrivateRoute";
+import RestrictedRoute from "../RestrictedRoute";
+import HomePage from "../../pages/HomePage/HomePage";
+import RegistrationPage from "../../pages/RegistrationPage/RegistrationPage";
+import LoginPage from "../../pages/LoginPage/LoginPage";
+import ContactsPage from "../../pages/ContactsPage/ContactsPage";
 
-function App() {
+export default function App() {
   const dispatch = useDispatch();
-
-  const items = useSelector(selectContacts);
-  const loading = useSelector(selectLoading);
-  const error = useSelector(selectError);
+  const isRefreshing = useSelector(selectIsRefreshing);
+  const isLoggedIn = useSelector(selectIsLoggedIn);
 
   useEffect(() => {
-    dispatch(fetchContacts());
+    dispatch(refreshUser());
   }, [dispatch]);
-  return (
-    <div className={css.container}>
-      <h1 className={css.text}>Phonebook</h1>
-      {loading && <p>Loading</p>}
-      {error && <ErrorMessage />}
-      <ContactForm />
-      <SearchBox />
-      {items.length > 0 && <ContactList />}
-    </div>
+
+  useEffect(() => {
+    if (isLoggedIn && !isRefreshing) {
+      dispatch(fetchContacts());
+    }
+  }, [dispatch, isLoggedIn, isRefreshing]);
+
+  return isRefreshing ? (
+    <div>Refreshing User...</div>
+  ) : (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route
+          path="/register"
+          element={<RestrictedRoute redirectTo="/contacts" />}
+        >
+          <Route index element={<RegistrationPage />} />
+        </Route>
+        <Route
+          path="/login"
+          element={<RestrictedRoute redirectTo="/contacts" />}
+        >
+          <Route index element={<LoginPage />} />
+        </Route>
+        <Route path="/contacts" element={<PrivateRoute redirectTo="/login" />}>
+          <Route index element={<ContactsPage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" />} />
+      </Route>
+    </Routes>
   );
 }
-
-export default App;

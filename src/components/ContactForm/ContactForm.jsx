@@ -1,55 +1,59 @@
-import css from "./ContactForm.module.css";
+import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useDispatch, useSelector } from "react-redux";
-import { addContact } from "../../redux/contactsOps";
+import styles from "./ContactForm.module.css";
+import { useDispatch } from "react-redux";
+import { addContact } from "../../redux/contacts/operations";
 
 export default function ContactForm() {
-  const initialValues = { name: "", number: "" };
-
   const dispatch = useDispatch();
+
+  const initialValues = {
+    name: "",
+    number: "",
+  };
 
   const validationSchema = Yup.object({
     name: Yup.string()
-      .min(3, "Must be at least 3 characters")
-      .max(50, "Must be less than 50 characters")
-      .required("Name is required"),
+      .min(3, "must be at least 3 characters long")
+      .max(50)
+      .required("Required"),
     number: Yup.string()
-      .min(3, "Must be at least 3 characters")
-      .max(50, "Must be less than 50 characters")
-      .required("Number is required"),
+      .min(3, "must be at least 3 characters long")
+      .max(50)
+      .required("Required"),
   });
 
-  const handleSubmit = (values, actions) => {
+  const handleSubmit = (values, { resetForm }) => {
     dispatch(addContact(values));
-    actions.resetForm();
+    resetForm();
   };
 
   return (
-    <div className={css.container}>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        <Form className={css.form}>
-          <label className={css.label}>
-            Name:
-            <Field type="text" name="name" className={css.input} />
-            <ErrorMessage name="name" component="div" className={css.error} />
-          </label>
-
-          <label className={css.label}>
-            Number:
-            <Field type="text" name="number" className={css.input} />
-            <ErrorMessage name="number" component="div" className={css.error} />
-          </label>
-
-          <button type="submit" className={css.button}>
-            Add Contact
-          </button>
-        </Form>
-      </Formik>
-    </div>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+    >
+      <Form className={styles.form}>
+        <label className={styles.label}>
+          Name
+          <Field type="text" name="name" className={styles.input} />
+          <ErrorMessage name="name" component="div" className={styles.error} />
+        </label>
+        <label className={styles.label}>
+          Number
+          <Field type="text" name="number" className={styles.input} />
+          <ErrorMessage
+            name="number"
+            component="div"
+            className={styles.error}
+          />
+        </label>
+        <button type="submit" className={styles.button}>
+          Add contact
+        </button>
+      </Form>
+    </Formik>
   );
 }
